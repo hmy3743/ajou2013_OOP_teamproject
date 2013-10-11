@@ -8,24 +8,25 @@ import java.util.Scanner;
 public class Client {
 	private Socket conn;
 	private Scanner scan = new Scanner(System.in);
-	public void connect () {
+	public void connect (String server) {
 		try {
-			conn = new Socket("overpl.us", 10001);
+			conn = new Socket(server, 10001);
 			ObjectOutputStream out;
 			ObjectInputStream in;
 			in = new ObjectInputStream(conn.getInputStream());
 			out = new ObjectOutputStream(conn.getOutputStream());
-			while (true) {
-				System.out.println(">");
-				String input = scan.nextLine();
-				if(input.equals(":q")){
-					break;
-				}
-				out.writeObject(input);
-				System.out.println((String)in.readObject());
+			ClientInputThread inThread = new ClientInputThread(in);
+			inThread.start();
+			String output = "";
+			while (!output.equals(":q")) {
+				output = scan.next();
+				out.writeObject(output);
 			}
+			conn.close();
+			out.close();
+			in.close();
 		} catch (Exception e) {
-			System.out.println(e);
+			System.out.println(this+"\t"+e);
 		}
 	}
 }

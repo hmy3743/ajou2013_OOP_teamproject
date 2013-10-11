@@ -18,9 +18,13 @@ public class ServerThread extends Thread {
 			input = new ObjectInputStream(conn.getInputStream());
 			Object in = null;
 			while ((in = input.readObject()) != null) {
-				parent.broadcast(in);
+				synchronized(Server.class){
+					parent.broadcast(conn, in);
+				}
 				in = null;
 			}
+			conn.close();
+			input.close();
 		} catch (Exception e) {
 			System.out.println(e);
 		}
