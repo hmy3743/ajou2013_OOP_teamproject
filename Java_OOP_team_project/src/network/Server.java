@@ -38,7 +38,7 @@ public class Server {
 	
 	private void addThread (Socket client) {
 		try{
-			ServerThread st = new ServerThread(new ObjectInputStream(client.getInputStream()));
+			ServerThread st = new ServerThread(client);
 			threads.execute(st);
 		}catch(Exception e) {
 			System.out.println(e);
