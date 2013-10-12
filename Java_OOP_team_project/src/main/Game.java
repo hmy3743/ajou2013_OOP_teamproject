@@ -1,6 +1,6 @@
 package main;
 
-import UI.*;
+import GameInterface.*;
 
 public class Game {
 
