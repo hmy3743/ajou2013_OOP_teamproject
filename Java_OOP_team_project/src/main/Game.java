@@ -13,6 +13,7 @@ public class Game {
 		GameInterface game = new GameInterface(settings) ;
 		
 		System.out.println(settings.getGameTime());
+		game.toString() ;
 		
 	}
 

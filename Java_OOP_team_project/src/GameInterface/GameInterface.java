@@ -10,6 +10,7 @@ public class GameInterface {
 		super();
 		set = settings;
 		set.setGameTime(10);
+		set.setMaximumPoint(10);
 	}
 	
 	
