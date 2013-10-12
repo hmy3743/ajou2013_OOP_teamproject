@@ -13,7 +13,9 @@ public class GameInterface {
 		set.setMaximumRoud(10);
 		set.setMaximumPoint(10);
 		}
-	
-	
+
+	public Settings getSet() {
+		return set;
+	}
 
 }
