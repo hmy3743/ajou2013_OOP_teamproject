@@ -1,21 +1,31 @@
 package network;
 
-import java.io.BufferedReader;
 import java.io.ObjectInputStream;
+import java.net.Socket;
 
 public class ServerThread extends Thread {
-	ObjectInputStream input;
-	ServerThread (ObjectInputStream inputFromClinet) {
-		input = inputFromClinet;
+	Socket conn;
+	Server parent;
+	
+	ServerThread(Socket Clinet, Server p) {
+		conn = Clinet;
+		parent = p;
 	}
-	public void run () {
+
+	public void run() {
+		ObjectInputStream input;
 		try{
-		Object in = null;
-		while ((in = input.readObject()) != null) {
-			//받아서 부모한테 넘겨주는 코드 작
-			in = null;
-		}
-		}catch(Exception e){
+			input = new ObjectInputStream(conn.getInputStream());
+			Object in = null;
+			while ((in = input.readObject()) != null) {
+				synchronized(Server.class){
+					parent.broadcast(conn, in);
+				}
+				in = null;
+			}
+			conn.close();
+			input.close();
+		} catch (Exception e) {
 			System.out.println(e);
 		}
 	}
