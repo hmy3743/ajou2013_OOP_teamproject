@@ -11,7 +11,8 @@ public class GameInterface {
 		set = settings;
 		set.setGameTime(10);	
 		set.setMaximumRoud(10);
-	}
+		set.setMaximumPoint(10);
+		}
 	
 	
 
