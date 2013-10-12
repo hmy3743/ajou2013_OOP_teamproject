@@ -14,8 +14,13 @@ public class GameInterface {
 		set.setMaximumPoint(10);
 		}
 
+
 	public Settings getSet() {
 		return set;
+	}
+
+	public void setSet(Settings set) {
+		this.set = set;
 	}
 
 }
