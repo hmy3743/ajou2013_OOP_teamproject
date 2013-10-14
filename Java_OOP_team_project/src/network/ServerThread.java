@@ -14,6 +14,7 @@ public class ServerThread extends Thread {
 
 	public void run() {
 		ObjectInputStream input;
+		String target = conn.getInetAddress().toString();
 		try{
 			input = new ObjectInputStream(conn.getInputStream());
 			Object in = null;
@@ -26,7 +27,7 @@ public class ServerThread extends Thread {
 			conn.close();
 			input.close();
 		} catch (Exception e) {
-			System.out.println(e);
+			System.out.println("disconnect from "+target);
 		}
 	}
 }
