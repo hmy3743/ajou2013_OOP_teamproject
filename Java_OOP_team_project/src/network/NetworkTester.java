@@ -9,15 +9,21 @@ public class NetworkTester {
 	public static void main (String args[]) {
 		System.out.println("input 1 for server else integer for client");
 		int choice = scan.nextInt();
+		Queue<Object> msg = new LinkedList<Object>();
 		if(choice == 1){
-			Server s = new Server();
+			Server s = new Server(msg);
 			s.start();
 		}
 		else{
 			System.out.println("input target server ip or domain");
-			Queue<Object> msg = new LinkedList<Object>();
-			Client c = new Client(msg);
-			c.connect(scan.next());
+			Client c = new Client(msg, scan.next());
+			c.start();
+		}
+		
+		Message in = null;
+		while(true){
+			while((in = (Message) msg.poll()) == null);
+			System.out.println(in.toString());
 		}
 	}
 }

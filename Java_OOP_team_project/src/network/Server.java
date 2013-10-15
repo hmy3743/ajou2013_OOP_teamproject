@@ -4,20 +4,22 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class Server {
+public class Server extends Thread {
 
 	private ExecutorService threads = Executors.newFixedThreadPool(10);
 	private ArrayList<Socket> sockets = new ArrayList<Socket>();
 	private ArrayList<ConnectInform> cast = new ArrayList<ConnectInform>();
-
-	public void start() {
-		run();
+	private Queue<Object> messageQueue;
+	
+	public Server (Queue<Object> pushEnd) {
+		messageQueue = pushEnd;
 	}
 
-	private void run() {
+	public void run() {
 		try {
 			ServerSocket ss = new ServerSocket(10001);
 
@@ -50,6 +52,7 @@ public class Server {
 	}
 
 	void broadcast(Socket from, Object msg) {
+		messageQueue.add(msg);
 		try {
 			for (ConnectInform cell : cast) {
 				if (cell.getSocket() == from) {

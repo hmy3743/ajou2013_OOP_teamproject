@@ -6,14 +6,19 @@ import java.net.Socket;
 import java.util.Queue;
 import java.util.Scanner;
 
-public class Client {
+public class Client extends Thread {
 	private Socket conn;
 	private Scanner scan = new Scanner(System.in);
 	private Queue<Object> pushEnd;
-	public Client (Queue<Object> msgQueue) {
+	private String server;
+	public Client (Queue<Object> msgQueue, String server) {
 		pushEnd = msgQueue;
+		this.server = server;
 	}
-	public void connect (String server) {
+	public void run () {
+		connect();
+	}
+	private void connect () {
 		try {
 			conn = new Socket(server, 10001);
 			System.out.println("Connecting success!");
@@ -23,10 +28,11 @@ public class Client {
 			out = new ObjectOutputStream(conn.getOutputStream());
 			ClientInputThread inThread = new ClientInputThread(in, pushEnd);
 			inThread.start();
-			String output;
+			Message output = new Message();
 			while (true) {
-				output = scan.nextLine();
-				if (output.equals(":q")) break;
+				output.setType(MessageType.CHAT);
+				output.setMessage(new ChatStruct(null, scan.nextLine()));
+				if (output.getMessage().getMsg().equals(":q")) break;
 				out.writeObject(output);
 			}
 			out.close();
