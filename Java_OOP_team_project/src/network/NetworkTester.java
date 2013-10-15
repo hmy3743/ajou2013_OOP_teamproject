@@ -1,5 +1,7 @@
 package network;
 
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Scanner;
 
 public class NetworkTester {
@@ -13,7 +15,8 @@ public class NetworkTester {
 		}
 		else{
 			System.out.println("input target server ip or domain");
-			Client c = new Client();
+			Queue<Object> msg = new LinkedList<Object>();
+			Client c = new Client(msg);
 			c.connect(scan.next());
 		}
 	}
