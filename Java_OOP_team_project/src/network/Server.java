@@ -60,4 +60,7 @@ public class Server {
 		} catch (IOException ignore) {
 		}
 	}
+	void bye (Socket closed) {
+		sockets.remove(closed);
+	}
 }

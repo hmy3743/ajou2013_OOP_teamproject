@@ -19,15 +19,18 @@ public class ServerThread extends Thread {
 			input = new ObjectInputStream(conn.getInputStream());
 			Object in = null;
 			while ((in = input.readObject()) != null) {
+				System.out.println("msg "+(String)in+" from "+conn.getInetAddress());
 				synchronized(Server.class){
 					parent.broadcast(conn, in);
 				}
 				in = null;
 			}
-			conn.close();
 			input.close();
+			conn.close();
+			parent.bye(conn);
 		} catch (Exception e) {
-			System.out.println("disconnect from "+target);
+			parent.bye(conn);
+//			System.out.println("Disconnect from "+target);
 		}
 	}
 }
