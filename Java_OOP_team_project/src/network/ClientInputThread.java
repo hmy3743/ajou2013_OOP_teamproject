@@ -16,7 +16,7 @@ public class ClientInputThread extends Thread {
 		try{
 		Object line = null;
 		while((line = inStream.readObject()) != null){
-			System.out.println("catch "+(String)line);
+//			System.out.println("catch "+(String)line);
 			outQueue.offer(line);
 		}
 		} catch(Exception e) {

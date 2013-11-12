@@ -43,16 +43,16 @@ public class Server extends Thread {
 			while(true) {
 				if(exitFlag) break;
 				if(qsize != messageIn.size()){
-					System.out.println("messageIn = "+messageIn);
-					System.out.println("messageOut = "+messageOut);
+//					System.out.println("messageIn = "+messageIn);
+//					System.out.println("messageOut = "+messageOut);
 					qsize = messageIn.size();
 				}
 				if(!messageIn.isEmpty()){
-					System.out.println("calling broadcast! with queue size "+messageIn.size());
+//					System.out.println("calling broadcast! with queue size "+messageIn.size());
 					broadcast(messageIn.poll());
 				}
 			}
-			System.out.println("while ends exitFlag = "+exitFlag);
+//			System.out.println("while ends exitFlag = "+exitFlag);
 			
 		} catch (Exception e) {
 			System.out.println(e);
@@ -76,7 +76,7 @@ public class Server extends Thread {
 	}
 
 	void broadcast(Socket from, Object msg) {
-		System.out.println("broadcast(from client) called");
+//		System.out.println("broadcast(from client) called");
 		messageOut.offer(msg);
 		try {
 			for (ConnectInform cell : cast) {
@@ -91,7 +91,7 @@ public class Server extends Thread {
 	}
 	
 	void broadcast(Object msg) {
-		System.out.println("echo on server "+ (String)msg);
+//		System.out.println("echo on server "+ (String)msg);
 		try {
 			for (ConnectInform cell : cast) {
 				cell.getOut().writeObject(msg);

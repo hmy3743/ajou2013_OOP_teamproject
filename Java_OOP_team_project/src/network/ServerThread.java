@@ -12,14 +12,14 @@ public class ServerThread extends Thread {
 	}
 
 	public void run() {
-		System.out.println("ready for input");
+//		System.out.println("ready for input");
 		ObjectInputStream input;
 		input = null;
 		try{
 			input = new ObjectInputStream(conn.getInputStream());
 			Object in = null;
 			while ((String)(in = input.readObject()) != null) {
-				System.out.println("catch "+(String)in);
+//				System.out.println("catch "+(String)in);
 				parent.broadcast(conn, in);
 				in = null;
 			}

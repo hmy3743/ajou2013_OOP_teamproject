@@ -30,14 +30,18 @@ public class Client extends Thread {
 			out = new ObjectOutputStream(conn.getOutputStream());
 			inThread = new ClientInputThread(in, outQueue);
 			inThread.start();
+			int qsize = -1;
 			while (true) {
-//				System.out.println(inQueue);
+				if(qsize != inQueue.size()){
+					qsize = inQueue.size();
+//					System.out.println("qsize = "+qsize);
+				}
 				if (!inQueue.isEmpty()){
-					System.out.println("inQueue = "+inQueue);
-					System.out.println("outQueue = "+outQueue);
+//					System.out.println("inQueue = "+inQueue);
+//					System.out.println("outQueue = "+outQueue);
 //					if(inQueue.peek() instanceof ExitFlag) break;
 					out.writeObject(inQueue.poll());
-					System.out.println("writing on socket");
+//					System.out.println("writing on socket");
 				}
 			}
 		} catch (Exception e) {
