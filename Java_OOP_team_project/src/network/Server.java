@@ -10,13 +10,19 @@ import java.util.concurrent.Executors;
 
 public class Server extends Thread {
 
-	private ExecutorService threads = Executors.newFixedThreadPool(10);
+	private ExecutorService threads;
 	private ArrayList<Socket> sockets = new ArrayList<Socket>();
 	private ArrayList<ConnectInform> cast = new ArrayList<ConnectInform>();
-	private Queue<Object> messageQueue;
+	private Queue<Object> messageIn; // server to other
+	private Queue<Object> messageOut; // other to server
+	private int roomSize = 0;
+	public boolean exitFlag = false;
 	
-	public Server (Queue<Object> pushEnd) {
-		messageQueue = pushEnd;
+	public Server (Queue<Object> pushEnd, Queue<Object> pullEnd, int roomSize) {
+		messageIn = pushEnd;
+		messageOut = pullEnd;
+		this.roomSize = roomSize;
+		threads = Executors.newFixedThreadPool(roomSize-1);
 	}
 
 	public void run() {
@@ -25,15 +31,33 @@ public class Server extends Thread {
 
 			System.out.println("Waiting for Connection...");
 
-			while (true) {
+			for (int i = 0; i < roomSize-1; i++) {
 				Socket so = ss.accept();
-				System.out.println("new connect from " + so.getInetAddress());
+				System.out.println((i+1)+"th connect from " + so.getInetAddress());
 				addSocket(so);
 				addThread(so);
 			}
-
+			
+			System.out.println("Connection all complete");
+			int qsize = -1;
+			while(true) {
+				if(exitFlag) break;
+				if(qsize != messageIn.size()){
+					System.out.println("messageIn = "+messageIn);
+					System.out.println("messageOut = "+messageOut);
+					qsize = messageIn.size();
+				}
+				if(!messageIn.isEmpty()){
+					System.out.println("calling broadcast! with queue size "+messageIn.size());
+					broadcast(messageIn.poll());
+				}
+			}
+			System.out.println("while ends exitFlag = "+exitFlag);
+			
 		} catch (Exception e) {
 			System.out.println(e);
+		} finally {
+			exit();
 		}
 	}
 
@@ -52,7 +76,8 @@ public class Server extends Thread {
 	}
 
 	void broadcast(Socket from, Object msg) {
-		messageQueue.add(msg);
+		System.out.println("broadcast(from client) called");
+		messageOut.offer(msg);
 		try {
 			for (ConnectInform cell : cast) {
 				if (cell.getSocket() == from) {
@@ -60,10 +85,26 @@ public class Server extends Thread {
 				}
 				cell.getOut().writeObject(msg);
 			}
-		} catch (IOException ignore) {
+		} catch (IOException e) {
+			System.out.println("exception on Server Broadcast method : "+e);
+		}
+	}
+	
+	void broadcast(Object msg) {
+		System.out.println("echo on server "+ (String)msg);
+		try {
+			for (ConnectInform cell : cast) {
+				cell.getOut().writeObject(msg);
+			}
+		} catch (IOException e) {
+			System.out.println("exception on Server Broadcast method : "+e);
 		}
 	}
 	void bye (Socket closed) {
 		sockets.remove(closed);
+	}
+	public void exit() {
+		threads.shutdown();
+		exitFlag = true;
 	}
 }

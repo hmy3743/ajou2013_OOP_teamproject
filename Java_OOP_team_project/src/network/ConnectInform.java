@@ -7,13 +7,15 @@ import java.net.Socket;
 public class ConnectInform {
 	private Socket socket;
 	private ObjectOutputStream out;
-	ConnectInform (Socket so) {
-		setSocket(so);
+	public ConnectInform(Socket client) {
+		setSocket(client);
 		try {
-			setOut(new ObjectOutputStream(so.getOutputStream()));
+			setOut(new ObjectOutputStream(client.getOutputStream()));
 		} catch (IOException e) {
-			System.out.println(this+"\t"+e);
+			// TODO Auto-generated catch block
+			System.out.println("IO Exception on ConnectInform init : "+e);
 		}
+		// TODO Auto-generated constructor stub
 	}
 	public Socket getSocket() {
 		return socket;
@@ -27,4 +29,5 @@ public class ConnectInform {
 	public void setOut(ObjectOutputStream out) {
 		this.out = out;
 	}
+
 }

@@ -1,18 +1,22 @@
 package network;
 
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Queue;
-import java.util.Scanner;
 
 public class Client extends Thread {
 	private Socket conn;
-	private Scanner scan = new Scanner(System.in);
-	private Queue<Object> pushEnd;
+	private Queue<Object> inQueue;
+	private Queue<Object> outQueue;
 	private String server;
-	public Client (Queue<Object> msgQueue, String server) {
-		pushEnd = msgQueue;
+	private ClientInputThread inThread;
+	private ObjectOutputStream out;
+	private ObjectInputStream in;
+	public Client (Queue<Object> inQueue, Queue<Object> outQueue, String server) {
+		this.inQueue = inQueue;
+		this.outQueue = outQueue;
 		this.server = server;
 	}
 	public void run () {
@@ -22,25 +26,29 @@ public class Client extends Thread {
 		try {
 			conn = new Socket(server, 10001);
 			System.out.println("Connecting success!");
-			ObjectOutputStream out;
-			ObjectInputStream in;
 			in = new ObjectInputStream(conn.getInputStream());
 			out = new ObjectOutputStream(conn.getOutputStream());
-			ClientInputThread inThread = new ClientInputThread(in, pushEnd);
+			inThread = new ClientInputThread(in, outQueue);
 			inThread.start();
-			Message output = new Message();
 			while (true) {
-				output.setType(MessageType.CHAT);
-				output.setMessage(new ChatStruct(null, scan.nextLine()));
-				if (output.getMessage().getMsg().equals(":q")) break;
-				out.writeObject(output);
+//				System.out.println(inQueue);
+				if (!inQueue.isEmpty()){
+					System.out.println("inQueue = "+inQueue);
+					System.out.println("outQueue = "+outQueue);
+//					if(inQueue.peek() instanceof ExitFlag) break;
+					out.writeObject(inQueue.poll());
+					System.out.println("writing on socket");
+				}
 			}
-			out.close();
-			in.close();
-			conn.close();
-			System.out.println("Disconnect!");
 		} catch (Exception e) {
-//			System.out.println(this+"\t"+e);
+			System.out.println("client "+this+"\t"+e);
+		} finally {
+			inThread.interrupt();
+			try {
+				out.close();
+				conn.close();
+			} catch (IOException ignore) {}
+			System.out.println("Disconnect!");
 		}
 	}
 }
