@@ -1,6 +1,7 @@
 package network;
 
 import java.io.ObjectInputStream;
+import java.io.Serializable;
 
 public class ClientInputThread extends Thread {
 	private ObjectInputStream inStream;
@@ -14,8 +15,8 @@ public class ClientInputThread extends Thread {
 	public void run () {
 		System.out.println("ready for input");
 		try{
-		Object line = null;
-		while((line = inStream.readObject()) != null){
+		Serializable line = null;
+		while((line = (Serializable) inStream.readObject()) != null){
 //			System.out.println("catch "+(String)line);
 			pushTo.pushMessage(line);
 		}

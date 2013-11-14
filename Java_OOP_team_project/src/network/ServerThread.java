@@ -1,14 +1,17 @@
 package network;
 
 import java.io.ObjectInputStream;
+import java.io.Serializable;
 import java.net.Socket;
 
 public class ServerThread extends Thread {
 	private Socket conn;
 	private Server parent;
-	public ServerThread(Socket Clinet, Server p) {
+	private NetCallable pushTo;
+	public ServerThread(Socket Clinet, Server p, NetCallable pushTo) {
 		conn = Clinet;
 		parent = p;
+		this.pushTo = pushTo;
 	}
 
 	public void run() {
@@ -17,10 +20,9 @@ public class ServerThread extends Thread {
 		input = null;
 		try{
 			input = new ObjectInputStream(conn.getInputStream());
-			Object in = null;
-			while ((String)(in = input.readObject()) != null) {
-//				System.out.println("catch "+(String)in);
-				parent.broadcast(conn, in);
+			Serializable in = null;
+			while ((in = (Serializable)input.readObject()) != null) {
+				pushTo.pushMessage(in);
 				in = null;
 			}
 		} catch (Exception e) {

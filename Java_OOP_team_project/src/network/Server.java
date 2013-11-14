@@ -51,14 +51,14 @@ public class Server{
 
 	private void addThread(Socket client) {
 		try {
-			ServerThread st = new ServerThread(client, this);
+			ServerThread st = new ServerThread(client, this, pushTo);
 			threads.execute(st);
 		} catch (Exception e) {
 			System.out.println(e);
 		}
 	}
 
-	void broadcast(Socket from, Object msg) {
+	void broadcast(Socket from, Serializable msg) {
 //		System.out.println("broadcast(from client) called");
 		pushTo.pushMessage(msg);
 		try {

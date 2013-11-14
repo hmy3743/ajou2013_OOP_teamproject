@@ -1,21 +1,23 @@
 package network;
 
+import java.io.Serializable;
 import java.util.Scanner;
 
 public class NetworkTester implements NetCallable {
+	private static Server s = null;
+	private static Client c = null;
 	private static Scanner scan = new Scanner(System.in);
 	public static void main (String args[]) {
 		System.out.println("input 1 for server else integer for client");
 		int choice = scan.nextInt();
 		scan.nextLine();
-		Server s;
-		Client c;
 		if(choice == 1){
 			System.out.println("Input the size of room");
 			s = new Server(new NetworkTester(), scan.nextInt());
 			scan.nextLine();
 			while(true){
-				s.send(scan.nextLine());
+				s.send(scan.next(), scan.nextInt());
+				scan.nextLine();
 			}
 		}
 		else{
@@ -24,13 +26,19 @@ public class NetworkTester implements NetCallable {
 			scan.nextLine();
 			while(true){
 				c.send(scan.nextLine());
+				scan.nextLine();
 			}
 		}
 	}
 	@Override
-	public void pushMessage(Object message) {
+	public void pushMessage(Serializable message) {
 		// TODO Auto-generated method stub
-		System.out.println(message);
+		if (s == null)
+			System.out.println(message);
+		else{
+			System.out.println(message);
+			s.send(message);
+		}
 	}
 	@Override
 	public void disconnect() {
