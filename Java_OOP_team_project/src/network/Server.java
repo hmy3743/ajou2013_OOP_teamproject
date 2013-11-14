@@ -1,30 +1,28 @@
 package network;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class Server extends Thread {
+public class Server{
 
 	private ExecutorService threads;
 	private ArrayList<Socket> sockets = new ArrayList<Socket>();
 	private ArrayList<ConnectInform> cast = new ArrayList<ConnectInform>();
-	private Queue<Object> messageIn; // server to other
-	private Queue<Object> messageOut; // other to server
+	private NetCallable pushTo;
 	private int roomSize = 0;
 	public boolean exitFlag = false;
 	
-	public Server (Queue<Object> pushEnd, Queue<Object> pullEnd, int roomSize) {
-		messageIn = pushEnd;
-		messageOut = pullEnd;
+	public Server (NetCallable pushTo, int roomSize) {
+		this.pushTo = pushTo;
 		this.roomSize = roomSize;
 		threads = Executors.newFixedThreadPool(roomSize-1);
+		run ();
 	}
-
 	public void run() {
 		try {
 			ServerSocket ss = new ServerSocket(10001);
@@ -38,22 +36,7 @@ public class Server extends Thread {
 				addThread(so);
 			}
 			
-			System.out.println("Connection all complete");
-			int qsize = -1;
-			while(true) {
-				if(exitFlag) break;
-				if(qsize != messageIn.size()){
-//					System.out.println("messageIn = "+messageIn);
-//					System.out.println("messageOut = "+messageOut);
-					qsize = messageIn.size();
-				}
-				if(!messageIn.isEmpty()){
-//					System.out.println("calling broadcast! with queue size "+messageIn.size());
-					broadcast(messageIn.poll());
-				}
-			}
-//			System.out.println("while ends exitFlag = "+exitFlag);
-			
+			System.out.println("Connection all complete");			
 		} catch (Exception e) {
 			System.out.println(e);
 		} finally {
@@ -77,7 +60,7 @@ public class Server extends Thread {
 
 	void broadcast(Socket from, Object msg) {
 //		System.out.println("broadcast(from client) called");
-		messageOut.offer(msg);
+		pushTo.pushMessage(msg);
 		try {
 			for (ConnectInform cell : cast) {
 				if (cell.getSocket() == from) {
@@ -101,10 +84,22 @@ public class Server extends Thread {
 		}
 	}
 	void bye (Socket closed) {
+		pushTo.disconnect(sockets.indexOf(closed)+1);
 		sockets.remove(closed);
 	}
 	public void exit() {
 		threads.shutdown();
 		exitFlag = true;
+	}
+	public void send (Serializable message) {
+		broadcast(message);
+	}
+	public void send (Serializable message, int target) {
+		try {
+			cast.get(target-1).getOut().writeObject(message);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

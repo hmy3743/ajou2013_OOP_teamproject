@@ -1,15 +1,15 @@
 package network;
 
-import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.util.Queue;
 
 public class ClientInputThread extends Thread {
 	private ObjectInputStream inStream;
-	private Queue<Object> outQueue;
-	ClientInputThread (ObjectInputStream st, Queue<Object> outQueue) {
+	private NetCallable pushTo;
+	private Client parent;
+	ClientInputThread (ObjectInputStream st, NetCallable pushTo, Client parent) {
 		inStream = st;
-		this.outQueue = outQueue;
+		this.pushTo = pushTo;
+		this.parent = parent;
 	}
 	public void run () {
 		System.out.println("ready for input");
@@ -17,15 +17,12 @@ public class ClientInputThread extends Thread {
 		Object line = null;
 		while((line = inStream.readObject()) != null){
 //			System.out.println("catch "+(String)line);
-			outQueue.offer(line);
+			pushTo.pushMessage(line);
 		}
 		} catch(Exception e) {
 			System.out.println("clientInputThread "+this+"\t"+e);
 		} finally {
-			try {
-				inStream.close();
-			} catch (IOException e) {
-			}
+			parent.disconnect();
 		}
 	}
 }

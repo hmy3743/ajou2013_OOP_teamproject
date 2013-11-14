@@ -25,13 +25,11 @@ public class ServerThread extends Thread {
 			}
 		} catch (Exception e) {
 			parent.bye(conn);
-//			System.out.println("Disconnect from "+target);
-		} finally {
 			try{
-			conn.close();
-			input.close();
-			parent.bye(conn);
-			}catch(Exception e){}
+				conn.close();
+				input.close();
+			}catch(Exception ignore){}
+//			System.out.println("Disconnect from "+target);
 		}
 	}
 }
