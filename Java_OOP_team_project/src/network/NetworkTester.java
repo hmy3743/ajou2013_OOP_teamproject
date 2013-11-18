@@ -16,8 +16,7 @@ public class NetworkTester implements NetCallable {
 			s = new Server(new NetworkTester(), scan.nextInt());
 			scan.nextLine();
 			while(true){
-				s.send(scan.next(), scan.nextInt());
-				scan.nextLine();
+				s.send(scan.nextLine()/*, scan.nextInt()*/);
 			}
 		}
 		else{
@@ -26,7 +25,6 @@ public class NetworkTester implements NetCallable {
 			scan.nextLine();
 			while(true){
 				c.send(scan.nextLine());
-				scan.nextLine();
 			}
 		}
 	}
