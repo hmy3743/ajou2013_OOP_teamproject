@@ -29,12 +29,12 @@ public class NetworkTester implements NetCallable {
 		}
 	}
 	@Override
-	public void pushMessage(Serializable message) {
+	public void pushMessage(Serializable message, int from) {
 		// TODO Auto-generated method stub
-		if (s == null)
-			System.out.println(message);
+		if (from == 0)
+			System.out.println(message + "from = " + from);
 		else{
-			System.out.println(message);
+			System.out.println(message + "from = " + from);
 			s.send(message);
 		}
 	}

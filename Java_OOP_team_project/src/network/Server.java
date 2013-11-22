@@ -33,7 +33,7 @@ public class Server{
 				Socket so = ss.accept();
 				System.out.println((i+1)+"th connect from " + so.getInetAddress());
 				addSocket(so);
-				addThread(so);
+				addThread(so, i+1);
 			}
 			
 			System.out.println("Connection all complete");			
@@ -49,18 +49,18 @@ public class Server{
 		cast.add(new ConnectInform(client));
 	}
 
-	private void addThread(Socket client) {
+	private void addThread(Socket client, int id) {
 		try {
-			ServerThread st = new ServerThread(client, this, pushTo);
+			ServerThread st = new ServerThread(client, this, pushTo, id);
 			threads.execute(st);
 		} catch (Exception e) {
 			System.out.println(e);
 		}
 	}
 
-	void broadcast(Socket from, Serializable msg) {
+	void broadcast(Socket from, Serializable msg, int id) {
 //		System.out.println("broadcast(from client) called");
-		pushTo.pushMessage(msg);
+		pushTo.pushMessage(msg, id);
 		try {
 			for (ConnectInform cell : cast) {
 				if (cell.getSocket() == from) {
@@ -94,9 +94,22 @@ public class Server{
 	public void send (Serializable message) {
 		broadcast(message);
 	}
-	public void send (Serializable message, int target) {
+	public void send (Serializable message, int... target) {
 		try {
-			cast.get(target-1).getOut().writeObject(message);
+			for(int cell : target){
+				cast.get(cell-1).getOut().writeObject(message);
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	public void send (Serializable message, int exclude) {
+		try {
+			for(int cell = 0; cell < cast.size(); cell++){
+				if(cell == exclude-1) continue;
+				cast.get(cell-1).getOut().writeObject(message);
+			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

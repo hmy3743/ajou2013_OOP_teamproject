@@ -24,7 +24,7 @@ public class Client {
 			System.out.println("Connecting success!");
 			in = new ObjectInputStream(conn.getInputStream());
 			out = new ObjectOutputStream(conn.getOutputStream());
-			inThread = new ClientInputThread(in, pushTo, this);
+			inThread = new ClientInputThread(in, pushTo, this, 0);
 			inThread.start();
 		} catch (Exception e) {
 			System.out.println("client "+this+"\t"+e);

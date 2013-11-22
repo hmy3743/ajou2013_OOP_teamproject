@@ -8,10 +8,12 @@ public class ServerThread extends Thread {
 	private Socket conn;
 	private Server parent;
 	private NetCallable pushTo;
-	public ServerThread(Socket Clinet, Server p, NetCallable pushTo) {
+	private int id;
+	public ServerThread(Socket Clinet, Server p, NetCallable pushTo, int id) {
 		conn = Clinet;
 		parent = p;
 		this.pushTo = pushTo;
+		this.id = id;
 	}
 
 	public void run() {
@@ -22,7 +24,7 @@ public class ServerThread extends Thread {
 			input = new ObjectInputStream(conn.getInputStream());
 			Serializable in = null;
 			while ((in = (Serializable)input.readObject()) != null) {
-				pushTo.pushMessage(in);
+				pushTo.pushMessage(in, id);
 				in = null;
 			}
 		} catch (Exception e) {
