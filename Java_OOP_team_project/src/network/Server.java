@@ -108,7 +108,7 @@ public class Server{
 		try {
 			for(int cell = 0; cell < cast.size(); cell++){
 				if(cell == exclude-1) continue;
-				cast.get(cell-1).getOut().writeObject(message);
+				cast.get(cell).getOut().writeObject(message);
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
