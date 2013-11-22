@@ -115,4 +115,7 @@ public class Server{
 			e.printStackTrace();
 		}
 	}
+	public void sendExcept (Serializable message, int exclude) {
+		send(message, exclude);
+	}
 }
